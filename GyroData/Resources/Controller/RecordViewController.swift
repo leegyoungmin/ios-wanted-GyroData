@@ -68,7 +68,7 @@ extension RecordViewController: MotionManagerDelegate {
 }
 
 extension RecordViewController: Uploadable {
-    func upload(completion: @escaping (Result<Void, Error>) -> Void) {
+    func upload(completion: @escaping (Result<Void, UploadError>) -> Void) {
         var isSuccessJson: Bool = false
         var isSuccessCoreData: Bool = false
         let uploadGroup = DispatchGroup()
@@ -184,17 +184,33 @@ private extension RecordViewController {
     
     @objc func didTapSaveButton() {
         indicator.startAnimating()
-        upload { result in
+        upload { [weak self] result in
+            guard let self = self else { return }
+            
             DispatchQueue.main.async {
+                self.indicator.stopAnimating()
                 switch result {
                 case .success:
-                    self.indicator.stopAnimating()
+                    self.dismiss(animated: true)
                     print("Save Success")
-                case .failure:
+                case .failure(let error):
                     print("Save Fail")
+                    self.presentErrorAlert(error: error)
                 }
             }
         }
+    }
+}
+
+private extension RecordViewController {
+    func presentErrorAlert(error: UploadError) {
+        let alert = AlertConcreteBuilder()
+            .setTitle(to: error.alertTitle)
+            .setMessage(to: error.alertMessage)
+            .setButton(title: "확인", style: .default, completion: nil)
+            .build()
+        
+        present(alert, animated: true)
     }
 }
 
