@@ -16,6 +16,8 @@
 		183BD42B298A0232005B480E /* (null) in Sources */ = {isa = PBXBuildFile; };
 		183BD42D298A09F2005B480E /* (null) in Sources */ = {isa = PBXBuildFile; };
 		183FA33B298A9F6E00B48A47 /* Uploadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183FA33A298A9F6E00B48A47 /* Uploadable.swift */; };
+		183FA33E298AA62800B48A47 /* AlertBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183FA33D298AA62800B48A47 /* AlertBuilder.swift */; };
+		183FA341298AAB7D00B48A47 /* UploadError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183FA340298AAB7D00B48A47 /* UploadError.swift */; };
 		18A4DAFA298A228A00B7BC1D /* SystemFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A4DAF9298A228A00B7BC1D /* SystemFileManager.swift */; };
 		18A4DAFC298A22B200B7BC1D /* MotionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A4DAFB298A22B200B7BC1D /* MotionManager.swift */; };
 		18A4DB02298A29D700B7BC1D /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A4DB01298A29D700B7BC1D /* Sensor.swift */; };
@@ -37,6 +39,8 @@
 		09E3105C298838870088E0EB /* PersistentContainerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentContainerManager.swift; sourceTree = "<group>"; };
 		09E3105E298845DD0088E0EB /* TransitionMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionMetaData.swift; sourceTree = "<group>"; };
 		183FA33A298A9F6E00B48A47 /* Uploadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uploadable.swift; sourceTree = "<group>"; };
+		183FA33D298AA62800B48A47 /* AlertBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertBuilder.swift; sourceTree = "<group>"; };
+		183FA340298AAB7D00B48A47 /* UploadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadError.swift; sourceTree = "<group>"; };
 		18A4DAF9298A228A00B7BC1D /* SystemFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemFileManager.swift; sourceTree = "<group>"; };
 		18A4DAFB298A22B200B7BC1D /* MotionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotionManager.swift; sourceTree = "<group>"; };
 		18A4DB01298A29D700B7BC1D /* Sensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
@@ -75,8 +79,17 @@
 			isa = PBXGroup;
 			children = (
 				183FA33A298A9F6E00B48A47 /* Uploadable.swift */,
+				183FA340298AAB7D00B48A47 /* UploadError.swift */,
 			);
 			path = Upload;
+			sourceTree = "<group>";
+		};
+		183FA33C298AA61800B48A47 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				183FA33D298AA62800B48A47 /* AlertBuilder.swift */,
+			);
+			path = Utility;
 			sourceTree = "<group>";
 		};
 		18A4DAFD298A293E00B7BC1D /* Motion */ = {
@@ -131,6 +144,7 @@
 		18D1105C2987AB960088ED79 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				183FA33C298AA61800B48A47 /* Utility */,
 				09DBC6712988CED7003228DB /* View */,
 				18D1106429880B6F0088ED79 /* Extensions */,
 				18D1105F2987ABC50088ED79 /* Controller */,
@@ -268,11 +282,13 @@
 				18D110632988078F0088ED79 /* Transition.swift in Sources */,
 				183BD42B298A0232005B480E /* (null) in Sources */,
 				63F01BB928D44FC400C53A39 /* TransitionListViewController.swift in Sources */,
+				183FA33E298AA62800B48A47 /* AlertBuilder.swift in Sources */,
 				09E3105F298845DD0088E0EB /* TransitionMetaData.swift in Sources */,
 				09E3105329882DED0088E0EB /* DataModel.xcdatamodeld in Sources */,
 				63F01BB528D44FC400C53A39 /* AppDelegate.swift in Sources */,
 				09E3105D298838870088E0EB /* PersistentContainerManager.swift in Sources */,
 				09E3104E2987E1B50088E0EB /* CustomTableViewCell.swift in Sources */,
+				183FA341298AAB7D00B48A47 /* UploadError.swift in Sources */,
 				09DBC66F2988CE26003228DB /* TransitionMetaDataObject+CoreDataClass.swift in Sources */,
 				09DBC6702988CE26003228DB /* TransitionMetaDataObject+CoreDataProperties.swift in Sources */,
 				183FA33B298A9F6E00B48A47 /* Uploadable.swift in Sources */,
