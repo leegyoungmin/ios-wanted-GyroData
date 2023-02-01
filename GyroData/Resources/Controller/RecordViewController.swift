@@ -58,6 +58,7 @@ extension RecordViewController: MotionManagerDelegate {
     
     func motionManager(stop manager: MotionManager, sendTime: Double) {
         self.recordTime = sendTime
+        convertButtonsState(isEnable: true)
     }
 }
 
