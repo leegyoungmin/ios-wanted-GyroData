@@ -33,6 +33,11 @@ final class RecordViewController: UIViewController {
         return button
     }()
     
+    let indicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        return indicator
+    }()
+    
     private let motionManager = MotionManager()
     private var recordTime: Double = 0
     private var recordedSensor: SensorType = .Accelerometer
@@ -141,6 +146,7 @@ private extension RecordViewController {
     }
     
     @objc func didTapSaveButton() {
+        indicator.startAnimating()
         let transitionData = values.convertTransition()
         guard let filePath = SystemFileManager.createFilePath() else { return }
         
@@ -156,7 +162,9 @@ private extension RecordViewController {
             self.uploadCoreData(with: uploadGroup, filePath: filePath, transitionData: transitionData)
         }
         
-        uploadGroup.notify(queue: .main) {
+        uploadGroup.notify(queue: .main) { [weak self] in
+            guard let self = self else { return }
+            self.indicator.stopAnimating()
             print("UPload 완료")
         }
     }
@@ -191,7 +199,7 @@ private extension RecordViewController {
     }
 
     func addChildView() {
-        [segmentControl, recordButton, cancelButton].forEach {
+        [segmentControl, recordButton, cancelButton, indicator].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
@@ -214,7 +222,10 @@ private extension RecordViewController {
             cancelButton.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
             cancelButton.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
             cancelButton.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor),
-            cancelButton.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -50)
+            cancelButton.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -50),
+            
+            indicator.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: safeArea.centerYAnchor)
         ])
     }
 }
