@@ -6,14 +6,8 @@
 
 import Foundation
 
-enum UploadError: Error {
-    case urlCreationFailed
-    case jsonUploadFailed
-    case coreDataUploadFailed
-}
-
 protocol Uploadable {
-    func upload(completion: @escaping (Result<Void, Error>) -> Void)
+    func upload(completion: @escaping (Result<Void, UploadError>) -> Void)
     
     func uploadJson(
         dispatchGroup: DispatchGroup,
