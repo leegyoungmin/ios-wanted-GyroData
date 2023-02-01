@@ -53,7 +53,6 @@ final class RecordViewController: UIViewController {
 extension RecordViewController: MotionManagerDelegate {
     func motionManager(send manager: MotionManager, sendData: CMLogItem?) {
         guard let data = sendData else { return }
-        print(data)
         saveData(data: data)
     }
     
@@ -72,6 +71,26 @@ private extension RecordViewController {
             let valueSet = gyroData.rotationRate
             values.append((valueSet.x, valueSet.y, valueSet.z))
         }
+    }
+    
+    func uploadFileInDisk(with group: DispatchGroup, filePath: URL, transitionData: Transition) {
+        group.enter()
+        let _ = SystemFileManager().saveData(path: filePath, value: transitionData)
+        group.leave()
+    }
+    
+    func uploadCoreData(with group: DispatchGroup, filePath: URL, transitionData: Transition) {
+        group.enter()
+        
+        let transitionMeta = TransitionMetaData(
+            saveDate: Date().description,
+            sensorType: self.recordedSensor,
+            recordTime: self.recordTime,
+            jsonName: filePath.absoluteString
+        )
+        
+        PersistentContainerManager.shared.createNewGyroObject(metaData: transitionMeta)
+        group.leave()
     }
 }
 
@@ -122,23 +141,20 @@ private extension RecordViewController {
         let transitionData = values.convertTransition()
         guard let filePath = SystemFileManager.createFilePath() else { return }
         
-        DispatchQueue.global().async {
-            let _ = SystemFileManager().saveData(path: filePath, value: transitionData)
-            
-            // TODO: - Handle Error
+        let uploadGroup = DispatchGroup()
+        
+        DispatchQueue.global().async(group: uploadGroup) { [weak self] in
+            guard let self = self else { return }
+            self.uploadFileInDisk(with: uploadGroup, filePath: filePath, transitionData: transitionData)
         }
         
-        DispatchQueue.global().async { [weak self] in
+        DispatchQueue.global().async(group: uploadGroup) { [weak self] in
             guard let self = self else { return }
-            
-            let transitionMeta = TransitionMetaData(
-                saveDate: Date().description,
-                sensorType: self.recordedSensor,
-                recordTime: self.recordTime,
-                jsonName: filePath.absoluteString
-            )
-            
-            PersistentContainerManager.shared.createNewGyroObject(metaData: transitionMeta)
+            self.uploadCoreData(with: uploadGroup, filePath: filePath, transitionData: transitionData)
+        }
+        
+        uploadGroup.notify(queue: .main) {
+            print("UPload 완료")
         }
     }
 }
