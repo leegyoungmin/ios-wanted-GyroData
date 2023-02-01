@@ -21,19 +21,22 @@ final class PersistentContainerManager {
         return container
     }()
 
-    func saveContext() {
+    @discardableResult
+    func saveContext() -> Bool {
         let context = PersistentContainerManager.shared.persistentContainer.viewContext
         if context.hasChanges {
             do {
                 try context.save()
+                return true
             } catch {
-                let error = error as NSError
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                return false
             }
+        } else {
+            return true
         }
     }
     
-    func createNewGyroObject(metaData: TransitionMetaData) {
+    func createNewGyroObject(metaData: TransitionMetaData) -> Bool {
         let context = persistentContainer.viewContext
         let newObject = TransitionMetaDataObject(context: context)
         
@@ -43,7 +46,7 @@ final class PersistentContainerManager {
         newObject.setValue(metaData.jsonName, forKey: "jsonName")
         newObject.setValue(metaData.id, forKey: "id")
         
-        saveContext()
+        return saveContext()
     }
 
     private func fetchTransitionMetaDataObjects() -> [TransitionMetaDataObject] {

@@ -79,13 +79,23 @@ private extension RecordViewController {
         }
     }
     
-    func uploadFileInDisk(with group: DispatchGroup, filePath: URL, transitionData: Transition) {
+    func uploadFileInDisk(
+        with group: DispatchGroup,
+        filePath: URL,
+        transitionData: Transition,
+        completion: @escaping (Bool) -> Void
+    ) {
         group.enter()
-        let _ = SystemFileManager().saveData(path: filePath, value: transitionData)
+        let result = SystemFileManager().saveData(path: filePath, value: transitionData)
+        completion(result)
         group.leave()
     }
     
-    func uploadCoreData(with group: DispatchGroup, filePath: URL, transitionData: Transition) {
+    func uploadCoreData(
+        with group: DispatchGroup,
+        filePath: URL,
+        completion: @escaping (Bool) -> Void
+    ) {
         group.enter()
         
         let transitionMeta = TransitionMetaData(
@@ -95,7 +105,8 @@ private extension RecordViewController {
             jsonName: filePath.absoluteString
         )
         
-        PersistentContainerManager.shared.createNewGyroObject(metaData: transitionMeta)
+        let result = PersistentContainerManager.shared.createNewGyroObject(metaData: transitionMeta)
+        completion(result)
         group.leave()
     }
 }
@@ -150,22 +161,37 @@ private extension RecordViewController {
         let transitionData = values.convertTransition()
         guard let filePath = SystemFileManager.createFilePath() else { return }
         
+        var isSuccessSaveJson: Bool = false
+        var isSuccessSaveCoreData: Bool = false
         let uploadGroup = DispatchGroup()
         
         DispatchQueue.global().async(group: uploadGroup) { [weak self] in
             guard let self = self else { return }
-            self.uploadFileInDisk(with: uploadGroup, filePath: filePath, transitionData: transitionData)
+            self.uploadFileInDisk(
+                with: uploadGroup,
+                filePath: filePath,
+                transitionData: transitionData) { isSuccess in
+                    isSuccessSaveJson = isSuccess
+                }
         }
         
         DispatchQueue.global().async(group: uploadGroup) { [weak self] in
             guard let self = self else { return }
-            self.uploadCoreData(with: uploadGroup, filePath: filePath, transitionData: transitionData)
+            self.uploadCoreData(
+                with: uploadGroup,
+                filePath: filePath
+            ) { isSuccess in
+                isSuccessSaveCoreData = isSuccess
+            }
         }
         
         uploadGroup.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
-            self.indicator.stopAnimating()
-            print("UPload 완료")
+            
+            if isSuccessSaveJson && isSuccessSaveCoreData {
+                self.indicator.stopAnimating()
+                print("UPload 완료")
+            }
         }
     }
 }
