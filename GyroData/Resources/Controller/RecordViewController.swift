@@ -67,6 +67,63 @@ extension RecordViewController: MotionManagerDelegate {
     }
 }
 
+extension RecordViewController: Uploadable {
+    func upload(completion: @escaping (Result<Void, Error>) -> Void) {
+        var isSuccessJson: Bool = false
+        var isSuccessCoreData: Bool = false
+        let uploadGroup = DispatchGroup()
+        
+        guard let filePath = SystemFileManager.createFilePath() else {
+            completion(.failure(UploadError.urlCreationFailed))
+            return
+        }
+        
+        let transitionValues = values.convertTransition()
+        let metaData = TransitionMetaData(
+            saveDate: Date().description,
+            sensorType: recordedSensor,
+            recordTime: recordTime,
+            jsonName: filePath.absoluteString
+        )
+        
+        uploadJson(dispatchGroup: uploadGroup, path: filePath, transition: transitionValues) { result in
+            switch result {
+            case .success(let isSuccess):
+                isSuccessJson = isSuccess
+            case .failure:
+                isSuccessJson = false
+            }
+        }
+        
+        uploadCoreDataObject(dispatchGroup: uploadGroup, metaData: metaData) { result in
+            switch result {
+            case .success(let isSuccess):
+                isSuccessCoreData = isSuccess
+                
+            case .failure:
+                isSuccessCoreData = false
+            }
+        }
+        
+        uploadGroup.notify(queue: .global()) {
+            if isSuccessJson == false {
+                completion(.failure(UploadError.jsonUploadFailed))
+                return
+            }
+            
+            if isSuccessCoreData == false {
+                completion(.failure(UploadError.coreDataUploadFailed))
+                return
+            }
+
+            if isSuccessJson && isSuccessCoreData {
+                completion(.success(()))
+                return
+            }
+        }
+    }
+}
+
 // MARK: - Business Logic
 private extension RecordViewController {
     func saveData(data: CMLogItem) {
@@ -77,37 +134,6 @@ private extension RecordViewController {
             let valueSet = gyroData.rotationRate
             values.append((valueSet.x, valueSet.y, valueSet.z))
         }
-    }
-    
-    func uploadFileInDisk(
-        with group: DispatchGroup,
-        filePath: URL,
-        transitionData: Transition,
-        completion: @escaping (Bool) -> Void
-    ) {
-        group.enter()
-        let result = SystemFileManager().saveData(path: filePath, value: transitionData)
-        completion(result)
-        group.leave()
-    }
-    
-    func uploadCoreData(
-        with group: DispatchGroup,
-        filePath: URL,
-        completion: @escaping (Bool) -> Void
-    ) {
-        group.enter()
-        
-        let transitionMeta = TransitionMetaData(
-            saveDate: Date().description,
-            sensorType: self.recordedSensor,
-            recordTime: self.recordTime,
-            jsonName: filePath.absoluteString
-        )
-        
-        let result = PersistentContainerManager.shared.createNewGyroObject(metaData: transitionMeta)
-        completion(result)
-        group.leave()
     }
 }
 
@@ -158,39 +184,15 @@ private extension RecordViewController {
     
     @objc func didTapSaveButton() {
         indicator.startAnimating()
-        let transitionData = values.convertTransition()
-        guard let filePath = SystemFileManager.createFilePath() else { return }
-        
-        var isSuccessSaveJson: Bool = false
-        var isSuccessSaveCoreData: Bool = false
-        let uploadGroup = DispatchGroup()
-        
-        DispatchQueue.global().async(group: uploadGroup) { [weak self] in
-            guard let self = self else { return }
-            self.uploadFileInDisk(
-                with: uploadGroup,
-                filePath: filePath,
-                transitionData: transitionData) { isSuccess in
-                    isSuccessSaveJson = isSuccess
+        upload { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self.indicator.stopAnimating()
+                    print("Save Success")
+                case .failure:
+                    print("Save Fail")
                 }
-        }
-        
-        DispatchQueue.global().async(group: uploadGroup) { [weak self] in
-            guard let self = self else { return }
-            self.uploadCoreData(
-                with: uploadGroup,
-                filePath: filePath
-            ) { isSuccess in
-                isSuccessSaveCoreData = isSuccess
-            }
-        }
-        
-        uploadGroup.notify(queue: .main) { [weak self] in
-            guard let self = self else { return }
-            
-            if isSuccessSaveJson && isSuccessSaveCoreData {
-                self.indicator.stopAnimating()
-                print("UPload 완료")
             }
         }
     }

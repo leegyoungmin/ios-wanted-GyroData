@@ -15,6 +15,7 @@
 		09E3105F298845DD0088E0EB /* TransitionMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09E3105E298845DD0088E0EB /* TransitionMetaData.swift */; };
 		183BD42B298A0232005B480E /* (null) in Sources */ = {isa = PBXBuildFile; };
 		183BD42D298A09F2005B480E /* (null) in Sources */ = {isa = PBXBuildFile; };
+		183FA33B298A9F6E00B48A47 /* Uploadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183FA33A298A9F6E00B48A47 /* Uploadable.swift */; };
 		18A4DAFA298A228A00B7BC1D /* SystemFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A4DAF9298A228A00B7BC1D /* SystemFileManager.swift */; };
 		18A4DAFC298A22B200B7BC1D /* MotionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A4DAFB298A22B200B7BC1D /* MotionManager.swift */; };
 		18A4DB02298A29D700B7BC1D /* Sensor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A4DB01298A29D700B7BC1D /* Sensor.swift */; };
@@ -35,6 +36,7 @@
 		09E3105229882DED0088E0EB /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
 		09E3105C298838870088E0EB /* PersistentContainerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentContainerManager.swift; sourceTree = "<group>"; };
 		09E3105E298845DD0088E0EB /* TransitionMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionMetaData.swift; sourceTree = "<group>"; };
+		183FA33A298A9F6E00B48A47 /* Uploadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uploadable.swift; sourceTree = "<group>"; };
 		18A4DAF9298A228A00B7BC1D /* SystemFileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemFileManager.swift; sourceTree = "<group>"; };
 		18A4DAFB298A22B200B7BC1D /* MotionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MotionManager.swift; sourceTree = "<group>"; };
 		18A4DB01298A29D700B7BC1D /* Sensor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensor.swift; sourceTree = "<group>"; };
@@ -67,6 +69,14 @@
 				09E3104D2987E1B50088E0EB /* CustomTableViewCell.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		183FA339298A9F6100B48A47 /* Upload */ = {
+			isa = PBXGroup;
+			children = (
+				183FA33A298A9F6E00B48A47 /* Uploadable.swift */,
+			);
+			path = Upload;
 			sourceTree = "<group>";
 		};
 		18A4DAFD298A293E00B7BC1D /* Motion */ = {
@@ -132,6 +142,7 @@
 		18D1105D2987ABBE0088ED79 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				183FA339298A9F6100B48A47 /* Upload */,
 				18A4DAFE298A294600B7BC1D /* CoreData */,
 				18A4DAFD298A293E00B7BC1D /* Motion */,
 				18A4DAFF298A295000B7BC1D /* SystemFile */,
@@ -264,6 +275,7 @@
 				09E3104E2987E1B50088E0EB /* CustomTableViewCell.swift in Sources */,
 				09DBC66F2988CE26003228DB /* TransitionMetaDataObject+CoreDataClass.swift in Sources */,
 				09DBC6702988CE26003228DB /* TransitionMetaDataObject+CoreDataProperties.swift in Sources */,
+				183FA33B298A9F6E00B48A47 /* Uploadable.swift in Sources */,
 				18D1106629880B7D0088ED79 /* Array+Extension.swift in Sources */,
 				18A4DAFA298A228A00B7BC1D /* SystemFileManager.swift in Sources */,
 				63F01BB728D44FC400C53A39 /* SceneDelegate.swift in Sources */,
