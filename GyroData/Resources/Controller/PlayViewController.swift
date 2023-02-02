@@ -12,10 +12,12 @@ final class PlayViewController: UIViewController {
         case view
     }
     
-    private var viewType: viewType
+    private let viewType: viewType
+    private let metaData: TransitionMetaData
     
-    init(viewType: PlayViewController.viewType) {
+    init(viewType: PlayViewController.viewType, metaData: TransitionMetaData) {
         self.viewType = viewType
+        self.metaData = metaData
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -25,6 +27,6 @@ final class PlayViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = .systemBackground
     }
 }

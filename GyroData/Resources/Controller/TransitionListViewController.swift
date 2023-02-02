@@ -68,6 +68,13 @@ extension TransitionListViewController: UITableViewDelegate {
 
         return UISwipeActionsConfiguration(actions: [deleteAction, playAction])
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let metaData = TransitionMetaData.transitionMetaDatas[indexPath.row]
+        let controller = PlayViewController(viewType: .view, metaData: metaData)
+        navigationController?.pushViewController(controller, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 }
 
 // MARK: - UIScrollViewDelegate
