@@ -105,7 +105,7 @@ extension RecordViewController: Uploadable {
             }
         }
         
-        uploadGroup.notify(queue: .global()) {
+        uploadGroup.notify(queue: .main) {
             if isSuccessJson == false {
                 completion(.failure(UploadError.jsonUploadFailed))
                 return
@@ -187,16 +187,13 @@ private extension RecordViewController {
         upload { [weak self] result in
             guard let self = self else { return }
             
-            DispatchQueue.main.async {
-                self.indicator.stopAnimating()
-                switch result {
-                case .success:
-                    self.dismiss(animated: true)
-                    print("Save Success")
-                case .failure(let error):
-                    print("Save Fail")
-                    self.presentErrorAlert(error: error)
-                }
+            self.indicator.stopAnimating()
+            switch result {
+            case .success:
+                self.navigationController?.popViewController(animated: true)
+
+            case .failure(let error):
+                self.presentErrorAlert(error: error)
             }
         }
     }
