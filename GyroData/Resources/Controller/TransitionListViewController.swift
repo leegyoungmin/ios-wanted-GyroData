@@ -50,6 +50,9 @@ extension TransitionListViewController: UITableViewDataSource {
 extension TransitionListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let playAction = UIContextualAction(style: .normal, title: nil) { (action, view, completionHandler) in
+            let metaData = TransitionMetaData.transitionMetaDatas[indexPath.row]
+            let controller = PlayViewController(viewType: .play, metaData: metaData)
+            self.navigationController?.pushViewController(controller, animated: true)
             completionHandler(false)
         }
         playAction.backgroundColor = .systemGreen

@@ -12,7 +12,7 @@ final class PlayViewController: UIViewController {
         case view = "View"
     }
     
-    private let viewType: viewType
+    private let playType: viewType
     private let metaData: TransitionMetaData
     
     private let dateLabel: UILabel = {
@@ -28,13 +28,17 @@ final class PlayViewController: UIViewController {
     }()
     
     private let controlButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "play"), for: .normal)
+        let button = UIButton(configuration: .plain())
+        
+        let configure = UIImage.SymbolConfiguration(font: .systemFont(ofSize: 40), scale: .large)
+        let playImage = UIImage(systemName: "play.fill", withConfiguration: configure)
+
+        button.setImage(playImage, for: .normal)
         return button
     }()
     
     init(viewType: PlayViewController.viewType, metaData: TransitionMetaData) {
-        self.viewType = viewType
+        self.playType = viewType
         self.metaData = metaData
         super.init(nibName: nil, bundle: nil)
     }
@@ -67,6 +71,11 @@ extension PlayViewController {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
+        
+        if playType == .play {
+            view.addSubview(controlButton)
+            controlButton.translatesAutoresizingMaskIntoConstraints = false
+        }
     }
     
     func setUpLayout() {
@@ -86,11 +95,23 @@ extension PlayViewController {
             viewTypeLabel.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
             viewTypeLabel.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
         ])
+        
+        if playType == .play {
+            setControlLayout()
+        }
+    }
+    
+    func setControlLayout() {
+        let safeArea = view.safeAreaLayoutGuide
+        NSLayoutConstraint.activate([
+            controlButton.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
+            controlButton.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -120)
+        ])
     }
     
     func setComponentsValues() {
         dateLabel.text = metaData.saveDate
-        viewTypeLabel.text = self.viewType.rawValue
+        viewTypeLabel.text = self.playType.rawValue
     }
     
     func setNavigationBar() {
