@@ -7,9 +7,9 @@
 import UIKit
 
 final class PlayViewController: UIViewController {
-    enum viewType {
-        case play
-        case view
+    enum viewType: String {
+        case play = "Play"
+        case view = "View"
     }
     
     private let viewType: viewType
@@ -17,7 +17,20 @@ final class PlayViewController: UIViewController {
     
     private let dateLabel: UILabel = {
         let label = UILabel()
+        label.font = .preferredFont(forTextStyle: .headline)
         return label
+    }()
+    
+    private let viewTypeLabel: UILabel = {
+        let label = UILabel()
+        label.font = .preferredFont(for: .largeTitle, weight: .bold)
+        return label
+    }()
+    
+    private let controlButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "play"), for: .normal)
+        return button
     }()
     
     init(viewType: PlayViewController.viewType, metaData: TransitionMetaData) {
@@ -49,6 +62,7 @@ extension PlayViewController {
     func addChildComponents() {
         [
             dateLabel,
+            viewTypeLabel
         ].forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -66,12 +80,17 @@ extension PlayViewController {
         NSLayoutConstraint.activate([
             dateLabel.topAnchor.constraint(equalTo: safeArea.topAnchor),
             dateLabel.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
-            dateLabel.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
+            dateLabel.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor),
+            
+            viewTypeLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 8),
+            viewTypeLabel.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
+            viewTypeLabel.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
         ])
     }
     
     func setComponentsValues() {
         dateLabel.text = metaData.saveDate
+        viewTypeLabel.text = self.viewType.rawValue
     }
     
     func setNavigationBar() {
