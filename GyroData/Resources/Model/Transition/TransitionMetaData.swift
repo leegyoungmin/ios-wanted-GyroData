@@ -26,7 +26,3 @@ struct TransitionMetaData: Identifiable {
         self.jsonName = jsonName
     }
 }
-
-extension TransitionMetaData {
-    static var transitionMetaDatas: [TransitionMetaData] = []
-}

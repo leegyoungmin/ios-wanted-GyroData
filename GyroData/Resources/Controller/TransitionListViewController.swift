@@ -17,32 +17,53 @@ final class TransitionListViewController: UIViewController {
     }()
 
     private let cellReuseIdentifier = "CustomCell"
+    private var transitionMetaDatas: [TransitionMetaData] = []
     private var isPaginating = false
-    private var pageIndex = 0
+    private var calledBringPageCount = 0
+    private var cellCount = 10
 
     // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
         configureUI()
-        loadListData()
+        
+        // TODO: - UI Test 코드 (삭제 예정)
+        for count in 0...25 {
+            transitionMetaDatas.append(
+                TransitionMetaData(saveDate: "2022/09/10 15:11:45",
+                                   sensorType: .Accelerometer,
+                                   recordTime: Double(count),
+                                   jsonName: "asdf")
+            )
+        }
+    }
+}
+
+// MARK: - Method
+private extension TransitionListViewController {
+    // Error타입 만들어주기
+    func bringAdditionalTransitionMetaData(completion: @escaping (Int) -> Void) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+            completion(10)
+        }
     }
 }
 
 // MARK: - UITableViewDataSource
 extension TransitionListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return TransitionMetaData.transitionMetaDatas.count
+        return cellCount
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let customCell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier, for: indexPath) as? CustomTableViewCell ?? CustomTableViewCell()
-        customCell.configureCell(data: TransitionMetaData.transitionMetaDatas[indexPath.row])
+        customCell.configureCell(data: transitionMetaDatas[indexPath.row])
         return customCell
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return view.frame.height / 7
+        return view.frame.height/7
     }
 }
 
@@ -50,16 +71,13 @@ extension TransitionListViewController: UITableViewDataSource {
 extension TransitionListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let playAction = UIContextualAction(style: .normal, title: nil) { (action, view, completionHandler) in
-            let metaData = TransitionMetaData.transitionMetaDatas[indexPath.row]
-            let controller = PlayViewController(viewType: .play, metaData: metaData)
-            self.navigationController?.pushViewController(controller, animated: true)
             completionHandler(false)
         }
         playAction.backgroundColor = .systemGreen
         playAction.image = createSwipeActionImage(text: "Play")
 
-        let deleteAction = UIContextualAction(style: .destructive, title: nil) { (action, view, completionHandler) in
-            TransitionMetaData.transitionMetaDatas.remove(at: indexPath.row)
+        let deleteAction = UIContextualAction(style: .destructive, title: nil) { [weak self] (action, view, completionHandler) in
+            self?.transitionMetaDatas.remove(at: indexPath.row)
             
             DispatchQueue.main.async {
                 tableView.reloadData()
@@ -71,61 +89,35 @@ extension TransitionListViewController: UITableViewDelegate {
 
         return UISwipeActionsConfiguration(actions: [deleteAction, playAction])
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let metaData = TransitionMetaData.transitionMetaDatas[indexPath.row]
-        let controller = PlayViewController(viewType: .view, metaData: metaData)
-        navigationController?.pushViewController(controller, animated: true)
-        tableView.deselectRow(at: indexPath, animated: true)
-    }
 }
 
 // MARK: - UIScrollViewDelegate
 extension TransitionListViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let triggerHeight = tableView.contentSize.height - scrollView.frame.size.height + 100
         let position = scrollView.contentOffset.y
 
-        if triggerHeight > 0 && position > triggerHeight {
-            guard !isPaginating else { return }
-            isPaginating = true
+        if position > tableView.contentSize.height - scrollView.frame.size.height + 100 {
             tableView.tableFooterView = createSpinnerFooter()
 
-            bringAdditionalTransitionMetaData { [weak self] data in
-                guard let self = self else { return }
-                TransitionMetaData.transitionMetaDatas.append(contentsOf: data)
+            bringAdditionalTransitionMetaData { [weak self] count in
+                DispatchQueue.main.async {
+                    self?.tableView.tableFooterView = nil
+                }
+
+                self?.cellCount += count
+                guard let currentCellCount = self?.cellCount,
+                      let maxCellCount = self?.transitionMetaDatas.count else {
+                    return
+                }
+
+                if currentCellCount > maxCellCount {
+                    self?.cellCount = maxCellCount
+                }
 
                 DispatchQueue.main.async {
-                    self.tableView.tableFooterView = nil
-                    self.tableView.reloadData()
+                    self?.tableView.reloadData()
                 }
             }
-        }
-    }
-}
-
-// MARK: - Method
-private extension TransitionListViewController {
-    // Error타입 만들어주기
-    func bringAdditionalTransitionMetaData(completion: @escaping ([TransitionMetaData]) -> Void) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 3) { [weak self] in
-            guard let self = self else { return }
-            let data = PersistentContainerManager.shared.fetchTenTransitionMetaDatas(pageCount: self.pageIndex)
-            self.pageIndex += 1
-            completion(data)
-            self.isPaginating = false
-        }
-    }
-
-    func loadListData() {
-        let data = PersistentContainerManager.shared.fetchTenTransitionMetaDatas(pageCount: pageIndex)
-        pageIndex += 1
-        isPaginating = false
-        TransitionMetaData.transitionMetaDatas.append(contentsOf: data)
-
-        DispatchQueue.main.async {
-            self.tableView.tableFooterView = nil
-            self.tableView.reloadData()
         }
     }
 }
@@ -163,10 +155,10 @@ private extension TransitionListViewController {
 
     func setNavigationBar() {
         let rightBarButton = UIBarButtonItem(title: "측정", style: .plain, target: self, action: #selector(didTapRecordButton))
-        rightBarButton.setTitleTextAttributes([.font: UIFont.preferredFont(forTextStyle: .title3)], for: .normal)
+        rightBarButton.setTitleTextAttributes([.font: UIFont.systemFont(ofSize: 24)], for: .normal)
         let titleLable = UILabel()
         titleLable.text = "목록"
-        titleLable.font = UIFont.preferredFont(forTextStyle: .title1)
+        titleLable.font = UIFont.systemFont(ofSize: 30)
         navigationItem.rightBarButtonItem = rightBarButton
         navigationItem.titleView = titleLable
     }
@@ -184,11 +176,7 @@ private extension TransitionListViewController {
 
     func createSwipeActionImage(text: String) -> UIImage? {
         let label = UILabel()
-        let metrics = UIFontMetrics(forTextStyle: .title2)
-        let desc = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
-        let font = UIFont.systemFont(ofSize: desc.pointSize, weight: .heavy)
-        label.font = metrics.scaledFont(for: font)
-        label.font = UIFont.preferredFont(for: .title2, weight: .heavy)
+        label.font = UIFont.boldSystemFont(ofSize: 30)
         label.textColor = UIColor.white
         label.text = text
         label.sizeToFit()
