@@ -14,6 +14,7 @@ final class PlayViewController: UIViewController {
     
     private let playType: viewType
     private let metaData: TransitionMetaData
+    private var playTime: Double = 0.0
     
     private let dateLabel: UILabel = {
         let label = UILabel()
@@ -85,13 +86,18 @@ extension PlayViewController {
 extension PlayViewController {
     func configureUI() {
         view.backgroundColor = .systemBackground
+        setAdditionalSafeArea()
+        
         setNavigationBar()
-        addChildComponents()
+        
+        addBaseChildComponents()
+        addPlayChildComponents()
+        
         setComponentsValues()
-        setUpLayout()
+        setUpBaseLayout()
     }
     
-    func addChildComponents() {
+    func addBaseChildComponents() {
         [
             dateLabel,
             viewTypeLabel
@@ -101,22 +107,28 @@ extension PlayViewController {
         }
         
         if playType == .play {
-            [
-                controlButton,
-                timeLabel
-            ].forEach {
-                view.addSubview($0)
-                $0.translatesAutoresizingMaskIntoConstraints = false
-            }
+            addPlayChildComponents()
         }
     }
     
-    func setUpLayout() {
+    func addPlayChildComponents() {
+        [
+            controlButton,
+            timeLabel
+        ].forEach {
+            view.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+    }
+    
+    func setAdditionalSafeArea() {
         additionalSafeAreaInsets.left += 16
         additionalSafeAreaInsets.right += 16
         additionalSafeAreaInsets.top += 16
         additionalSafeAreaInsets.bottom += 16
-        
+    }
+    
+    func setUpBaseLayout() {
         let safeArea = view.safeAreaLayoutGuide
         
         NSLayoutConstraint.activate([
@@ -150,7 +162,7 @@ extension PlayViewController {
         viewTypeLabel.text = self.playType.rawValue
         
         if playType == .play {
-            timeLabel.text = metaData.recordTime.description
+            timeLabel.text = playTime.description
         }
     }
     
